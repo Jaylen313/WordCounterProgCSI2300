@@ -1,40 +1,55 @@
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.Scanner;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-public class CountWordProg 
-{
-    public static void main(String[] args) throws FileNotFoundException 
-    {
-        File inputFile = new File("input.txt");
-        File outputFile = new File("output.txt");
+public class CountWordProg {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String[] names = new String[4];
 
-        Map<String, Integer> wordCount = new HashMap<>();
+        
+        for (int i = 0; i < names.length; i++) {
+            System.out.print("Enter name " + (i + 1) + ": ");
+            names[i] = scanner.nextLine();
+        }
+        scanner.close();
 
-        try (Scanner scanner = new Scanner(inputFile)) 
-        {
-            while (scanner.hasNextLine()) 
-            {
-                String line = scanner.nextLine().toLowerCase().trim();
-                if (!line.isEmpty()) 
-                { 
-                    wordCount.put(line, wordCount.getOrDefault(line, 0) + 1);
-                }
-            }
+        
+        Random random = new Random();
+        StringBuilder content = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            String randomName = names[random.nextInt(names.length)];
+            content.append(randomName).append(System.lineSeparator());
         }
 
-        try (PrintWriter writer = new PrintWriter(outputFile)) 
-        {
-            for (Map.Entry<String, Integer> entry : wordCount.entrySet()) 
-            {
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("input.txt"))) {
+            writer.write(content.toString());
+            System.out.println("Input file created successfully.");
+        } catch (IOException e) {
+            System.out.println("Error creating input file: " + e.getMessage());
+        }
+
+        
+        Map<String, Integer> nameCount = new HashMap<>();
+        try (Scanner fileScanner = new Scanner(new File("input.txt"))) {
+            while (fileScanner.hasNextLine()) {
+                String name = fileScanner.nextLine();
+                nameCount.put(name, nameCount.getOrDefault(name, 0) + 1);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error reading input file: " + e.getMessage());
+        }
+
+        
+        try (PrintWriter writer = new PrintWriter("output.txt")) {
+            for (Map.Entry<String, Integer> entry : nameCount.entrySet()) {
                 writer.println(entry.getKey() + " " + entry.getValue());
             }
+            System.out.println("Name count is done and saved in output.txt file.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error creating output file: " + e.getMessage());
         }
-        System.out.println("Word count is done and saved in output.txt file.");
     }
 }
